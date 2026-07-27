@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automix"
+version = "1.0.0"
+description = "Automated stem mixing and mastering, standalone desktop app"
+requires-python = ">=3.9"
+dependencies = [
+    "pedalboard>=0.9",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "soundfile>=0.12",
+    "pyloudnorm>=0.1.1",
+]
+
+[project.scripts]
+automix-cli = "automix_cli:main"
+
+[project.gui-scripts]
+automix-gui = "automix_gui:main"
+
+[tool.setuptools]
+py-modules = ["automix_cli", "automix_gui", "engine", "dsp", "presets", "stem_types"]

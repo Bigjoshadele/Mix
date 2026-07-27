@@ -1,4 +1,4 @@
- name: Build AutoMix.exe (Windows)
+name: Build AutoMix
 
 on:
   push:

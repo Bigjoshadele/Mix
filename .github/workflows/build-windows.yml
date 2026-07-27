@@ -1,0 +1,52 @@
+name: Build AutoMix.exe (Windows)
+
+# Builds the actual standalone Windows executable on GitHub's own Windows
+# runner. This is the missing piece that can't be done from a Linux
+# machine: PyInstaller has to run on the target OS to produce a native
+# .exe. Nobody running this needs Python installed locally - GitHub's
+# runner has it, builds AutoMix.exe, and hands you back the finished
+# binary as a downloadable artifact.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch: {}
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build AutoMix.exe
+        run: |
+          pyinstaller --noconfirm --onefile --windowed `
+            --name AutoMix `
+            --icon assets\automix.ico `
+            --add-data "assets;assets" `
+            automix_gui.py
+
+      - name: Verify the exe was actually produced
+        run: |
+          if (!(Test-Path "dist\AutoMix.exe")) {
+            Write-Error "Build did not produce dist\AutoMix.exe"
+            exit 1
+          }
+          Get-Item dist\AutoMix.exe | Format-List Name, Length
+
+      - name: Upload AutoMix.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoMix-windows
+          path: dist/AutoMix.exe
+          retention-days: 90
